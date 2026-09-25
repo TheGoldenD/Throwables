@@ -133,6 +133,10 @@ public final class ThrowableEvents {
 
         /*
          * Consume one item in Survival.
+         *
+         * LivingEntityUseItemEvent.Stop does not provide
+         * the hand directly, so use the hand Minecraft
+         * recorded when the entity started using the item.
          */
         if (
                 entity instanceof Player player
@@ -140,7 +144,7 @@ public final class ThrowableEvents {
         ) {
             ItemStack heldStack =
                     player.getItemInHand(
-                            event.getHand()
+                            player.getUsedItemHand()
                     );
 
             if (
