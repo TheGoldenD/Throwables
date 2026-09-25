@@ -1,7 +1,12 @@
 package com.auy.throwables;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -35,7 +40,7 @@ public final class ThrowableClient {
     public static void registerClientExtensions(
             RegisterClientExtensionsEvent event
     ) {
-        IClientItemExtensions spearAnimation =
+        IClientItemExtensions throwableAnimation =
                 new IClientItemExtensions() {
 
                     @Override
@@ -53,12 +58,91 @@ public final class ThrowableClient {
 
                         return null;
                     }
+
+                    @Override
+                    public boolean applyForgeHandTransform(
+                            PoseStack poseStack,
+                            LocalPlayer player,
+                            HumanoidArm arm,
+                            ItemStack itemInHand,
+                            float partialTick,
+                            float equipProcess,
+                            float swingProcess
+                    ) {
+                        if (
+                                !player.isUsingItem()
+                                        || player.getUseItem().isEmpty()
+                        ) {
+                            return false;
+                        }
+
+                        InteractionHand usedHand =
+                                player.getUsedItemHand();
+
+                        HumanoidArm usedArm =
+                                usedHand == InteractionHand.MAIN_HAND
+                                        ? player.getMainArm()
+                                        : player.getMainArm().getOpposite();
+
+                        if (arm != usedArm) {
+                            return false;
+                        }
+
+                        float side =
+                                arm == HumanoidArm.RIGHT
+                                        ? 1.0F
+                                        : -1.0F;
+
+                        /*
+                         * Keep the throwable raised, but smaller and
+                         * farther toward the side of the screen.
+                         */
+                        poseStack.translate(
+                                side * 0.28F,
+                                -0.02F,
+                                -0.18F
+                        );
+
+                        /*
+                         * Smaller first-person item.
+                         */
+                        poseStack.scale(
+                                0.60F,
+                                0.60F,
+                                0.60F
+                        );
+
+                        /*
+                         * Raised throwing angle.
+                         */
+                        poseStack.mulPose(
+                                Axis.XP.rotationDegrees(-55.0F)
+                        );
+
+                        poseStack.mulPose(
+                                Axis.YP.rotationDegrees(
+                                        side * 18.0F
+                                )
+                        );
+
+                        poseStack.mulPose(
+                                Axis.ZP.rotationDegrees(
+                                        side * 6.0F
+                                )
+                        );
+
+                        return true;
+                    }
                 };
 
         event.registerItem(
-                spearAnimation,
+                throwableAnimation,
                 Items.EGG,
-                Items.SNOWBALL
+                Items.SNOWBALL,
+                Items.ENDER_PEARL,
+                Items.EXPERIENCE_BOTTLE,
+                Items.SPLASH_POTION,
+                Items.LINGERING_POTION
         );
     }
 }

@@ -1,5 +1,8 @@
 package com.auy.throwables;
 
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -57,8 +60,9 @@ public final class ThrowableEvents {
             LivingEntityUseItemEvent.Stop event
     ) {
         LivingEntity entity = event.getEntity();
+        ItemStack stack = event.getItem();
 
-        baller definition = definitionFor(event.getItem());
+        baller definition = definitionFor(stack);
 
         if (definition == null) {
             return;
@@ -80,7 +84,7 @@ public final class ThrowableEvents {
                         .apply(entity.level(), entity);
 
         projectile.setItem(
-                event.getItem().copyWithCount(1)
+                stack.copyWithCount(1)
         );
 
         float velocity =
@@ -97,6 +101,11 @@ public final class ThrowableEvents {
 
         entity.level().addFreshEntity(projectile);
 
+        playThrowSound(
+                entity,
+                stack
+        );
+
         if (
                 entity instanceof Player player
                         && !player.getAbilities().instabuild
@@ -108,7 +117,7 @@ public final class ThrowableEvents {
 
             if (
                     heldStack.is(
-                            event.getItem().getItem()
+                            stack.getItem()
                     )
             ) {
                 heldStack.shrink(1);
@@ -116,8 +125,65 @@ public final class ThrowableEvents {
         }
     }
 
-    private static baller definitionFor(ItemStack stack) {
+    private static void playThrowSound(
+            LivingEntity entity,
+            ItemStack stack
+    ) {
+        SoundEvent sound = soundFor(stack);
 
+        if (sound == null) {
+            return;
+        }
+
+        entity.level().playSound(
+                null,
+                entity.getX(),
+                entity.getY(),
+                entity.getZ(),
+                sound,
+                SoundSource.PLAYERS,
+                0.5F,
+                0.4F / (
+                        entity.level().getRandom().nextFloat()
+                                * 0.4F
+                                + 0.8F
+                )
+        );
+    }
+
+    private static SoundEvent soundFor(
+            ItemStack stack
+    ) {
+        if (stack.is(Items.EGG)) {
+            return SoundEvents.EGG_THROW;
+        }
+
+        if (stack.is(Items.SNOWBALL)) {
+            return SoundEvents.SNOWBALL_THROW;
+        }
+
+        if (stack.is(Items.ENDER_PEARL)) {
+            return SoundEvents.ENDER_PEARL_THROW;
+        }
+
+        if (stack.is(Items.EXPERIENCE_BOTTLE)) {
+            return SoundEvents.EXPERIENCE_BOTTLE_THROW;
+        }
+
+        if (stack.is(Items.SPLASH_POTION)) {
+            return SoundEvents.SPLASH_POTION_THROW;
+        }
+
+        if (stack.is(Items.LINGERING_POTION)) {
+            return SoundEvents.LINGERING_POTION_THROW;
+        }
+
+        return null;
+    }
+
+    private static baller definitionFor(
+            ItemStack stack
+    ) {
         if (
                 stack.is(Items.EGG)
                         && ThrowableConfig.ENABLE_EGG.get()
