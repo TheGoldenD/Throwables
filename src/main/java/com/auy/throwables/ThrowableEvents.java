@@ -15,8 +15,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 @EventBusSubscriber(
-        modid = Throwables.MOD_ID,
-        bus = EventBusSubscriber.Bus.GAME
+        modid = Throwables.MOD_ID
 )
 public final class ThrowableEvents {
 
@@ -26,11 +25,10 @@ public final class ThrowableEvents {
     }
 
     /**
-     * Intercepts right-clicking an egg or snowball.
+     * Intercepts right-clicking a supported throwable.
      *
-     * Normally Minecraft immediately throws these items.
-     * We cancel that behavior and put the player into the
-     * normal item-use state instead.
+     * If the throwable is disabled in the config,
+     * vanilla Minecraft behavior is left untouched.
      */
     @SubscribeEvent
     public static void onRightClickItem(
@@ -53,8 +51,8 @@ public final class ThrowableEvents {
     }
 
     /**
-     * Changes the use duration of eggs and snowballs
-     * so the player can hold right-click.
+     * Changes the use duration so the player can
+     * hold right-click.
      */
     @SubscribeEvent
     public static void onUseStart(
@@ -70,7 +68,7 @@ public final class ThrowableEvents {
     /**
      * Called when the player releases right-click.
      *
-     * The charge time determines the projectile velocity.
+     * Charge time determines projectile velocity.
      */
     @SubscribeEvent
     public static void onUseStop(
@@ -96,8 +94,7 @@ public final class ThrowableEvents {
         }
 
         /*
-         * Only the server should create the projectile.
-         * Otherwise both client and server could create one.
+         * Only the server creates the projectile.
          */
         if (entity.level().isClientSide) {
             return;
@@ -108,8 +105,8 @@ public final class ThrowableEvents {
                         .apply(entity.level(), entity);
 
         /*
-         * Keep one copy of the original item on the
-         * projectile.
+         * Keep one copy of the original item
+         * on the projectile.
          */
         projectile.setItem(
                 event.getItem().copyWithCount(1)
@@ -133,10 +130,6 @@ public final class ThrowableEvents {
 
         /*
          * Consume one item in Survival.
-         *
-         * LivingEntityUseItemEvent.Stop does not provide
-         * the hand directly, so use the hand Minecraft
-         * recorded when the entity started using the item.
          */
         if (
                 entity instanceof Player player
@@ -158,8 +151,10 @@ public final class ThrowableEvents {
     }
 
     /**
-     * Returns the throwing configuration for supported
-     * vanilla items.
+     * Returns the throwing configuration for a supported
+     * vanilla item.
+     *
+     * Returning null means the item should behave normally.
      */
     private static baller definitionFor(
             ItemStack stack
@@ -168,6 +163,11 @@ public final class ThrowableEvents {
          * Vanilla Egg
          */
         if (stack.is(Items.EGG)) {
+
+            if (!ThrowableConfig.ENABLE_EGG.get()) {
+                return null;
+            }
+
             return baller.of(
                     (Level level, LivingEntity entity) ->
                             new ThrownEgg(
@@ -181,6 +181,11 @@ public final class ThrowableEvents {
          * Vanilla Snowball
          */
         if (stack.is(Items.SNOWBALL)) {
+
+            if (!ThrowableConfig.ENABLE_SNOWBALL.get()) {
+                return null;
+            }
+
             return baller.of(
                     (Level level, LivingEntity entity) ->
                             new Snowball(
