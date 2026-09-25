@@ -1,0 +1,13 @@
+{
+  "itemGroup.throwables": "Example Mod Tab",
+  "block.throwables.example_block": "Example Block",
+  "item.throwables.example_item": "Example Item",
+
+  "throwables.configuration.title": "Throwables Configs",
+  "throwables.configuration.section.throwables.common.toml": "Throwables Configs",
+  "throwables.configuration.section.throwables.common.toml.title": "Throwables Configs",
+  "throwables.configuration.items": "Item List",
+  "throwables.configuration.logDirtBlock": "Log Dirt Block",
+  "throwables.configuration.magicNumberIntroduction": "Magic Number Text",
+  "throwables.configuration.magicNumber": "Magic Number"
+}
