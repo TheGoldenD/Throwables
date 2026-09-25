@@ -14,7 +14,10 @@ public class HoldableThrowableItem extends Item {
 
     private final baller definition;
 
-    public HoldableThrowableItem(Properties properties, baller definition) {
+    public HoldableThrowableItem(
+            Properties properties,
+            baller definition
+    ) {
         super(properties);
         this.definition = definition;
     }
@@ -33,7 +36,10 @@ public class HoldableThrowableItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(
+            ItemStack stack,
+            LivingEntity entity
+    ) {
         return ThrowableEvents.MAX_USE_TICKS;
     }
 
@@ -55,7 +61,7 @@ public class HoldableThrowableItem extends Item {
             int timeLeft
     ) {
         int chargeTicks =
-                getUseDuration(stack) - timeLeft;
+                getUseDuration(stack, entity) - timeLeft;
 
         if (chargeTicks < definition.minChargeTicks()) {
             return;
