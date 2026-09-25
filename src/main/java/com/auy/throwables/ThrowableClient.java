@@ -5,19 +5,30 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
+@Mod(value = Throwables.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(
         modid = Throwables.MOD_ID,
         value = Dist.CLIENT
 )
 public final class ThrowableClient {
 
-    private ThrowableClient() {
+    public ThrowableClient(ModContainer container) {
+        container.registerExtensionPoint(
+                IConfigScreenFactory.class,
+                (minecraft, parent) ->
+                        new ConfigurationScreen(container, parent)
+        );
     }
 
     @SubscribeEvent

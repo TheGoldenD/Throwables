@@ -9,5 +9,12 @@
   "throwables.configuration.items": "Item List",
   "throwables.configuration.logDirtBlock": "Log Dirt Block",
   "throwables.configuration.magicNumberIntroduction": "Magic Number Text",
-  "throwables.configuration.magicNumber": "Magic Number"
+  "throwables.configuration.magicNumber": "Magic Number",
+
+  "config.throwables.enable_egg": "Egg",
+  "config.throwables.enable_snowball": "Snowball",
+  "config.throwables.enable_ender_pearl": "Ender Pearl",
+  "config.throwables.enable_experience_bottle": "Experience Bottle",
+  "config.throwables.enable_splash_potion": "Splash Potion",
+  "config.throwables.enable_lingering_potion": "Lingering Potion"
 }

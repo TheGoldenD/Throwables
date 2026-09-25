@@ -2,7 +2,7 @@ package com.auy.throwables;
 
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 
 @Mod(Throwables.MOD_ID)
 public class Throwables {
