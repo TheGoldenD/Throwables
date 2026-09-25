@@ -189,4 +189,3 @@ public final class ThrowableEvents {
         return null;
     }
 }
-```

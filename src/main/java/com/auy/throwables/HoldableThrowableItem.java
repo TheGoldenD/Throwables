@@ -94,4 +94,3 @@ public class HoldableThrowableItem extends Item {
         }
     }
 }
-```
