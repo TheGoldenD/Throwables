@@ -1,4 +1,3 @@
-
 package com.auy.throwables;
 
 import net.minecraft.world.InteractionHand;
