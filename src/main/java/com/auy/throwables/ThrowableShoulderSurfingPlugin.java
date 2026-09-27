@@ -8,6 +8,12 @@ import com.github.exopandora.shouldersurfing.api.plugin.IShoulderSurfingPlugin;
 
 import net.minecraft.world.entity.LivingEntity;
 
+/**
+ * Loaded reflectively by Shoulder Surfing Reloaded itself (via
+ * shouldersurfing_plugin.json) if and only if it is installed.
+ * Nothing in the rest of the mod references this class directly,
+ * so it is never classloaded on a setup without Shoulder Surfing.
+ */
 public class ThrowableShoulderSurfingPlugin implements IShoulderSurfingPlugin {
 
     @Override
