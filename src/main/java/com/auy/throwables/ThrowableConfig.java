@@ -12,6 +12,7 @@ public final class ThrowableConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_EXPERIENCE_BOTTLE;
     public static final ModConfigSpec.BooleanValue ENABLE_SPLASH_POTION;
     public static final ModConfigSpec.BooleanValue ENABLE_LINGERING_POTION;
+    public static final ModConfigSpec.BooleanValue ENABLE_COBBLEMON_POKEBALLS;
 
     static {
         ModConfigSpec.Builder builder =
@@ -48,6 +49,11 @@ public final class ThrowableConfig {
                 .comment("Enable charged throwing for lingering potions.")
                 .translation("config.throwables.enable_lingering_potion")
                 .define("enable_lingering_potion", true);
+
+        ENABLE_COBBLEMON_POKEBALLS = builder
+                .comment("Enable charged throwing for Cobblemon Poké Balls when Cobblemon is installed.")
+                .translation("config.throwables.enable_cobblemon_pokeballs")
+                .define("enable_cobblemon_pokeballs", true);
 
         builder.pop();
 

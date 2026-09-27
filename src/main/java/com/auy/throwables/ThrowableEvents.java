@@ -1,8 +1,5 @@
 package com.auy.throwables;
 
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +12,9 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -60,9 +59,9 @@ public final class ThrowableEvents {
             LivingEntityUseItemEvent.Stop event
     ) {
         LivingEntity entity = event.getEntity();
-        ItemStack stack = event.getItem();
 
-        baller definition = definitionFor(stack);
+        baller definition =
+                definitionFor(event.getItem());
 
         if (definition == null) {
             return;
@@ -83,28 +82,64 @@ public final class ThrowableEvents {
                 definition.projectileFactory()
                         .apply(entity.level(), entity);
 
+        if (projectile == null) {
+            return;
+        }
+
         projectile.setItem(
-                stack.copyWithCount(1)
+                event.getItem().copyWithCount(1)
         );
 
         float velocity =
                 definition.velocityForCharge(chargeTicks);
 
-        projectile.shootFromRotation(
-                entity,
-                entity.getXRot(),
-                entity.getYRot(),
-                0.0F,
-                velocity,
-                definition.inaccuracy()
-        );
+        /*
+         * Cobblemon's normal Poké Ball throw uses a small
+         * overhand adjustment. Keep that behavior while
+         * replacing its fixed throw power with our charged
+         * velocity.
+         */
+        if (
+                ModList.get().isLoaded("cobblemon")
+                        && CobblemonIntegration.isPokeBall(event.getItem())
+        ) {
+            float overhandFactor =
+                    entity.getXRot() < 0.0F
+                            ? 5.0F * (float) Math.cos(
+                            Math.toRadians(entity.getXRot())
+                    )
+                            : 5.0F;
+
+            projectile.shootFromRotation(
+                    entity,
+                    entity.getXRot() - overhandFactor,
+                    entity.getYRot(),
+                    0.0F,
+                    velocity,
+                    definition.inaccuracy()
+            );
+
+            projectile.setPos(
+                    projectile.position()
+                            .add(
+                                    projectile
+                                            .getDeltaMovement()
+                                            .normalize()
+                                            .scale(1.0)
+                            )
+            );
+        } else {
+            projectile.shootFromRotation(
+                    entity,
+                    entity.getXRot(),
+                    entity.getYRot(),
+                    0.0F,
+                    velocity,
+                    definition.inaccuracy()
+            );
+        }
 
         entity.level().addFreshEntity(projectile);
-
-        playThrowSound(
-                entity,
-                stack
-        );
 
         if (
                 entity instanceof Player player
@@ -117,7 +152,7 @@ public final class ThrowableEvents {
 
             if (
                     heldStack.is(
-                            stack.getItem()
+                            event.getItem().getItem()
                     )
             ) {
                 heldStack.shrink(1);
@@ -125,65 +160,8 @@ public final class ThrowableEvents {
         }
     }
 
-    private static void playThrowSound(
-            LivingEntity entity,
-            ItemStack stack
-    ) {
-        SoundEvent sound = soundFor(stack);
+    private static baller definitionFor(ItemStack stack) {
 
-        if (sound == null) {
-            return;
-        }
-
-        entity.level().playSound(
-                null,
-                entity.getX(),
-                entity.getY(),
-                entity.getZ(),
-                sound,
-                SoundSource.PLAYERS,
-                0.5F,
-                0.4F / (
-                        entity.level().getRandom().nextFloat()
-                                * 0.4F
-                                + 0.8F
-                )
-        );
-    }
-
-    private static SoundEvent soundFor(
-            ItemStack stack
-    ) {
-        if (stack.is(Items.EGG)) {
-            return SoundEvents.EGG_THROW;
-        }
-
-        if (stack.is(Items.SNOWBALL)) {
-            return SoundEvents.SNOWBALL_THROW;
-        }
-
-        if (stack.is(Items.ENDER_PEARL)) {
-            return SoundEvents.ENDER_PEARL_THROW;
-        }
-
-        if (stack.is(Items.EXPERIENCE_BOTTLE)) {
-            return SoundEvents.EXPERIENCE_BOTTLE_THROW;
-        }
-
-        if (stack.is(Items.SPLASH_POTION)) {
-            return SoundEvents.SPLASH_POTION_THROW;
-        }
-
-        if (stack.is(Items.LINGERING_POTION)) {
-            return SoundEvents.LINGERING_POTION_THROW;
-        }
-
-        return null;
-    }
-
-    private static baller definitionFor(
-            ItemStack stack
-    ) {
         if (
                 stack.is(Items.EGG)
                         && ThrowableConfig.ENABLE_EGG.get()
@@ -259,6 +237,34 @@ public final class ThrowableEvents {
                                     level,
                                     entity
                             )
+            );
+        }
+
+        /*
+         * Optional Cobblemon integration.
+         *
+         * PokeBallItem is only referenced after checking that
+         * Cobblemon is actually loaded, keeping Throwables
+         * usable without Cobblemon installed.
+         */
+        if (
+                ThrowableConfig.ENABLE_COBBLEMON_POKEBALLS.get()
+                        && ModList.get().isLoaded("cobblemon")
+                        && CobblemonIntegration.isPokeBall(stack)
+        ) {
+            float throwPower =
+                    CobblemonIntegration.getThrowPower(stack);
+
+            float minVelocity =
+                    Math.max(
+                            0.35F,
+                            throwPower * 0.5F
+                    );
+
+            return baller.of(
+                    CobblemonIntegration::createProjectile,
+                    minVelocity,
+                    throwPower
             );
         }
 

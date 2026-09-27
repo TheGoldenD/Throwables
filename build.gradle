@@ -19,18 +19,18 @@ sourceSets.main.resources {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-
-        filter {
-            includeGroup "maven.modrinth"
-        }
+    maven {
+        url = "https://www.cursemaven.com"
     }
+
+    maven {
+        url = "https://api.modrinth.com/maven"
+    }
+    maven {
+        name = "Kotlin for Forge"
+        url = "https://thedarkcolour.github.io/KotlinForForge/"
+    }
+
 }
 
 base {
@@ -93,7 +93,14 @@ configurations {
 }
 
 dependencies {
+    // Cobblemon 1.8.0 - NeoForge 1.21.1
+    implementation "curse.maven:cobblemon-687131:8818732"
+
+    // Required by Cobblemon
+    implementation "thedarkcolour:kotlinforforge-neoforge:5.11.0"
+
     implementation "maven.modrinth:twkfQtEc:u6BWvDt1"
+
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
