@@ -160,7 +160,7 @@ public final class ThrowableEvents {
         }
     }
 
-    private static baller definitionFor(ItemStack stack) {
+    public static baller definitionFor(ItemStack stack) {
 
         if (
                 stack.is(Items.EGG)
