@@ -93,8 +93,8 @@ configurations {
 }
 
 dependencies {
-    // Cobblemon 1.8.0 - NeoForge 1.21.1
-    implementation "curse.maven:cobblemon-687131:8818732"
+    // Cobblemon 1.8.1 - NeoForge 1.21.1
+    implementation "maven.modrinth:MdwFAVRL:7otgw3aH"
 
     // Required by Cobblemon
     implementation "thedarkcolour:kotlinforforge-neoforge:5.11.0"
