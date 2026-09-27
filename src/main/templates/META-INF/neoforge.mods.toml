@@ -38,3 +38,10 @@ type="required"
 versionRange="[1.8.1,)"
 ordering="AFTER"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="shouldersurfing"
+type="optional"
+versionRange="[1.21.1-5.0,)"
+ordering="NONE"
+side="CLIENT"

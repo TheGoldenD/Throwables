@@ -100,6 +100,7 @@ dependencies {
     implementation "thedarkcolour:kotlinforforge-neoforge:5.11.0"
 
     implementation "maven.modrinth:twkfQtEc:u6BWvDt1"
+    implementation "maven.modrinth:kepjj2sy:qyfeYi1c"
 
 }
 
